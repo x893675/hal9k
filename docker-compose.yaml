@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+
+  coolq:
+    image: "coolq/wine-coolq:latest"
+    environment:
+      - COOLQ_URL=http://dlsec.cqp.me/cqp-full
+      - VNC_PASSWD=12345678
+    restart: always
+    ports:
+      - "9000:9000"
+    volumes:
+      - /opt/coolq:/home/user/coolq
+
+  hal9k:
+    image: "hal9k:latest"
+    command: /app/hal9k --qbot-ep=ws://coolq:6700
+    depends_on:
+      - coolq
+    restart: always
+    volumes:
+      - /opt/coolq/
