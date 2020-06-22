@@ -9,7 +9,7 @@ import (
 
 func main() {
 	for i:=0; i < 10; i++ {
-		fmt.Println(RangeRand(0, 100))
+		fmt.Println(RangeRand(0, 0))
 	}
 }
 

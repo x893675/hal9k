@@ -41,11 +41,11 @@ func ShowImage(update qqbotapi.Update) {
 		reply(update, fmt.Sprintf("不存在标签为%s的图片!", args[0]))
 		return
 	}
-	index := RangeRand(0, int64(imgNum))
+	index := RangeRand(0, int64(imgNum)-1)
 	imgname := files[index].Name()
 	msg := fmt.Sprintf("[CQ:image,file=%s\\%s]", args[0], imgname)
 	logger.Info(nil, "msg is %v", msg)
-	//reply(update, msg)
+	reply(update, msg)
 }
 
 func RangeRand(min, max int64) int64 {
