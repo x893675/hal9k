@@ -85,12 +85,11 @@ func searchByID(update qqbotapi.Update, id string) {
 		logger.Error(nil, err.Error())
 		return
 	}
-	uri := fmt.Sprintf("[CQ:image,file=%s,cache=0]", illust.ImageUrl.Large)
-	if uri == "" {
+	if illust.ImageUrl.Large == "" {
 		reply(update, "图片不存在")
 		return
 	}
-	reply(update, revproxy(uri))
+	reply(update, revproxy(fmt.Sprintf("[CQ:image,file=%s,cache=0]", illust.ImageUrl.Large)))
 }
 
 func searchByWord(update qqbotapi.Update, keyword string) {
@@ -111,18 +110,24 @@ func searchByWord(update qqbotapi.Update, keyword string) {
 		logger.Error(nil, err.Error())
 		return
 	}
-	var illust = Illust{}
+	var illust []*Illust
 	err = json.Unmarshal(body, &illust)
 	if err != nil {
 		logger.Error(nil, err.Error())
 		return
 	}
-	uri := fmt.Sprintf("[CQ:image,file=%s,cache=0]", illust.ImageUrl.Large)
-	if uri == "" {
-		reply(update, "图片不存在")
+	if len(illust) > 0 {
+		index := RangeRand(0, int64(len(illust)-1))
+		if illust[index].ImageUrl.Large == "" {
+			reply(update, "未找到相关图片")
+			return
+		}
+		reply(update, revproxy(fmt.Sprintf("[CQ:image,file=%s,cache=0]", illust[index].ImageUrl.Large)))
+	} else {
+		reply(update, "未找到相关图片")
 		return
 	}
-	reply(update, revproxy(uri))
+
 }
 
 func revproxy(url string) string {
