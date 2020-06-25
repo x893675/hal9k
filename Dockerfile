@@ -13,6 +13,7 @@ ARG COMMIT_REF
 
 ENV LUCK_FILE "/etc/hal9k/luck_data.json"
 ENV IMAGE_PATH "/data"
+ENV GRAPH_ADDR "http://localhost:8080"
 
 LABEL repo-url=${REPO_URL}
 LABEL branch=${BRANCH}
