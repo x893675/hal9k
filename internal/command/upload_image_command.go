@@ -58,7 +58,7 @@ func uploadImage(update qqbotapi.Update, args []string) {
 	logger.Info(nil, "img catalog is %s", args[0])
 	logger.Info(nil, "img url is %s", imgUrl)
 	go downloadFile(args[0], imgUrl, fileId)
-	reply(update, fmt.Sprintf("%s,%s", args[0], imgUrl))
+	//reply(update, fmt.Sprintf("%s,%s", args[0], imgUrl))
 }
 
 func downloadFile(catalog string, url string, fileId string) {
