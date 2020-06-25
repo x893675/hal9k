@@ -39,6 +39,10 @@ type Illust struct {
 	IllustrationInfo `json:"illust"`
 }
 
+type Illusts struct {
+	I []*IllustrationInfo `json:"illusts"`
+}
+
 func init() {
 	var err error
 	numberRe, err = regexp.Compile(numberPattern)
@@ -110,19 +114,19 @@ func searchByWord(update qqbotapi.Update, keyword string) {
 		logger.Error(nil, err.Error())
 		return
 	}
-	var illust []*Illust
-	err = json.Unmarshal(body, &illust)
+	var illusts Illusts
+	err = json.Unmarshal(body, &illusts)
 	if err != nil {
 		logger.Error(nil, err.Error())
 		return
 	}
-	if len(illust) > 0 {
-		index := RangeRand(0, int64(len(illust)-1))
-		if illust[index].ImageUrl.Large == "" {
+	if len(illusts.I) > 0 {
+		index := RangeRand(0, int64(len(illusts.I)-1))
+		if illusts.I[index].ImageUrl.Large == "" {
 			reply(update, "未找到相关图片")
 			return
 		}
-		reply(update, revproxy(fmt.Sprintf("[CQ:image,file=%s,cache=0]", illust[index].ImageUrl.Large)))
+		reply(update, revproxy(fmt.Sprintf("[CQ:image,file=%s,cache=0]", illusts.I[index].ImageUrl.Large)))
 	} else {
 		reply(update, "未找到相关图片")
 		return

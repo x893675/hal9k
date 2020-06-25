@@ -10,7 +10,7 @@ import (
 	"math"
 	"math/big"
 	"net/http"
-	"regexp"
+	"net/url"
 	"time"
 )
 
@@ -32,11 +32,16 @@ type Illust struct {
 	IllustrationInfo `json:"illust"`
 }
 
+type Illusts struct {
+	I []*IllustrationInfo `json:"illusts"`
+}
+
 func main() {
-	pattern := `^([1-9]\d*)\b` //反斜杠要转义
-	str := "12453435353535353"
-	result,_ := regexp.MatchString(pattern,str)
-	fmt.Println(result)
+	//pattern := `^([1-9]\d*)\b` //反斜杠要转义
+	//str := "12453435353535353"
+	//result,_ := regexp.MatchString(pattern,str)
+	//fmt.Println(result)
+	searchByWord("FGO")
 	//searchByID("77558582")
 }
 
@@ -80,4 +85,41 @@ func searchByID(id string) {
 		return
 	}
 	logger.Info(nil, "+%v", illust)
+}
+
+
+func searchByWord(keyword string) {
+	key := url.QueryEscape(keyword)
+	c := http.Client{
+		Transport:     nil,
+		CheckRedirect: nil,
+		Jar:           nil,
+		Timeout:       5 * time.Second,
+	}
+	resp, err := c.Get(fmt.Sprintf(constants.PixivSearchByKeyword, key))
+	if err != nil {
+		logger.Error(nil, "search pixiv  by keywork error, %v", err)
+		return
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		logger.Error(nil, err.Error())
+		return
+	}
+	var illust Illusts
+	err = json.Unmarshal(body, &illust)
+	if err != nil {
+		logger.Error(nil, err.Error())
+		return
+	}
+	if len(illust.Illusts) > 0 {
+		index := RangeRand(0, int64(len(illust.Illusts)-1))
+		if illust.Illusts[index].ImageUrl.Large == "" {
+			return
+		}
+		fmt.Println(fmt.Sprintf("[CQ:image,file=%s,cache=0]", illust.Illusts[index].ImageUrl.Large))
+	} else {
+		return
+	}
+
 }
