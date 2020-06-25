@@ -1,6 +1,6 @@
 GOPATH ?= $(shell go env GOPATH)
 
-apps = 'hal9k'
+apps = hal9k
 
 VERSION ?= $(shell git rev-parse --short HEAD)-$(shell date -u '+%Y%m%d%I%M%S')
 REPO_URL ?= $(shell git ls-remote --get-url origin)
@@ -9,7 +9,7 @@ COMMIT_REF ?= $(shell git rev-parse --verify HEAD)
 
 .PHONY: build
 build:
-	CGO_ENABLED=0 go build -o dist/${app} -a -ldflags "-w -s -X hal9k/pkg/version.Version=${VERSION}" ./cmd/
+	CGO_ENABLED=0 go build -o dist/${apps} -a -ldflags "-w -s -X hal9k/pkg/version.Version=${VERSION}" ./cmd/
 
 
 .PHONY: image

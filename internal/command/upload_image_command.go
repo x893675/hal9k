@@ -23,18 +23,21 @@ func init() {
 
 func UploadImageCommand(update qqbotapi.Update) {
 	_, args := update.Message.Command()
+	logger.Info(nil, "args is  %v", args)
 	switch args[0] {
 	case constants.UploadCommand:
-		uploadImage(update, args[2:])
+		uploadImage(update, args[1:])
 		return
 	case constants.HelpCommand:
+		fallthrough
 	default:
-		reply(update, "参数错误!\n/不支持的自命令，使用/image help查看用法")
+		reply(update, "参数错误!\n不支持的子命令，使用/image help查看用法")
 		return
 	}
 }
 
 func uploadImage(update qqbotapi.Update, args []string) {
+	logger.Info(nil, "args is %v", args)
 	if len(args) != 2 {
 		reply(update, "参数错误!\n/image upload $catalog image")
 		return
