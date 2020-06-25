@@ -8,6 +8,7 @@ import (
 	serverconfig "hal9k/pkg/config"
 	"hal9k/pkg/logger"
 	"hal9k/pkg/utils/signals"
+	"hal9k/pkg/version"
 	utilerrors "k8s.io/apimachinery/pkg/util/errors"
 )
 
@@ -72,5 +73,6 @@ func Run(s *options.Hal9000Options, stopCh <-chan struct{}) error {
 	if err != nil {
 		return err
 	}
+	logger.Info(nil, "service verson is %s", version.Version)
 	return internal.NewHttpServer(s.ServiceCfg)
 }

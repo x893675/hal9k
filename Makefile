@@ -14,4 +14,8 @@ build:
 
 .PHONY: image
 image:
-	docker build --build-arg REPO_URL=$(REPO_URL) --build-arg BRANCH=$(BRANCH) --build-arg COMMIT_REF=$(COMMIT_REF) --build-arg VERSION=$(VERSION) -f Dockerfile -t hal9k:latest .
+	docker build --build-arg REPO_URL=$(REPO_URL) --build-arg BRANCH=$(BRANCH) --build-arg COMMIT_REF=$(COMMIT_REF) --build-arg VERSION=$(VERSION) -f Dockerfile -t hanamichi/hal9k:latest .
+
+.PHONY: push
+push:
+	docker hanamichi/hal9k:latest
