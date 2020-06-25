@@ -9,7 +9,15 @@ import (
 	"hal9k/pkg/logger"
 	"io/ioutil"
 	"net/http"
+	"net/url"
+	"regexp"
+	"strings"
 	"time"
+)
+
+var (
+	numberPattern = `^([1-9]\d*)\b`
+	numberRe      *regexp.Regexp
 )
 
 type ImageUrls struct {
@@ -23,6 +31,8 @@ type IllustrationInfo struct {
 	Height     int       `json:"height"`
 	Id         int       `json:"id"`
 	ImageUrl   ImageUrls `json:"image_urls"`
+	Restrict   int       `json:"x-restrict"`
+	Tags       []string  `json:"tags"`
 }
 
 type Illust struct {
@@ -30,13 +40,26 @@ type Illust struct {
 }
 
 func init() {
+	var err error
+	numberRe, err = regexp.Compile(numberPattern)
+	if err != nil {
+		panic(err)
+	}
 	qbot.RegistryCommandHandler("pixiv", PixivCommand)
 }
 
 func PixivCommand(update qqbotapi.Update) {
 	_, args := update.Message.Command()
 	logger.Info(nil, "args is  %v", args)
-	searchByID(update, args[0])
+	if len(args) < 1 {
+		reply(update, "参数错误!")
+		return
+	}
+	if numberRe.MatchString(args[0]) {
+		searchByID(update, args[0])
+	} else {
+		searchByWord(update, args[0])
+	}
 }
 
 func searchByID(update qqbotapi.Update, id string) {
@@ -62,5 +85,47 @@ func searchByID(update qqbotapi.Update, id string) {
 		logger.Error(nil, err.Error())
 		return
 	}
-	reply(update, fmt.Sprintf("[CQ:image,file=%s,cache=0]", illust.ImageUrl.Large))
+	uri := fmt.Sprintf("[CQ:image,file=%s,cache=0]", illust.ImageUrl.Large)
+	if uri == "" {
+		reply(update, "图片不存在")
+		return
+	}
+	reply(update, revproxy(uri))
+}
+
+func searchByWord(update qqbotapi.Update, keyword string) {
+	key := url.QueryEscape(keyword)
+	c := http.Client{
+		Transport:     nil,
+		CheckRedirect: nil,
+		Jar:           nil,
+		Timeout:       5 * time.Second,
+	}
+	resp, err := c.Get(fmt.Sprintf(constants.PixivSearchByKeyword, key))
+	if err != nil {
+		logger.Error(nil, "search pixiv  by keywork error, %v", err)
+		return
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		logger.Error(nil, err.Error())
+		return
+	}
+	var illust = Illust{}
+	err = json.Unmarshal(body, &illust)
+	if err != nil {
+		logger.Error(nil, err.Error())
+		return
+	}
+	uri := fmt.Sprintf("[CQ:image,file=%s,cache=0]", illust.ImageUrl.Large)
+	if uri == "" {
+		reply(update, "图片不存在")
+		return
+	}
+	reply(update, revproxy(uri))
+}
+
+func revproxy(url string) string {
+	u := strings.ReplaceAll(url, constants.PixivOriginalDomain, constants.PixivRevproxyDomain)
+	return strings.ReplaceAll(u, "_webp", "")
 }

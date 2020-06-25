@@ -10,6 +10,7 @@ import (
 	"math"
 	"math/big"
 	"net/http"
+	"regexp"
 	"time"
 )
 
@@ -32,7 +33,11 @@ type Illust struct {
 }
 
 func main() {
-	searchByID("77558582")
+	pattern := `^([1-9]\d*)\b` //反斜杠要转义
+	str := "12453435353535353"
+	result,_ := regexp.MatchString(pattern,str)
+	fmt.Println(result)
+	//searchByID("77558582")
 }
 
 func RangeRand(min, max int64) int64 {
