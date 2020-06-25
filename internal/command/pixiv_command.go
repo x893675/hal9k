@@ -32,7 +32,7 @@ type IllustrationInfo struct {
 	Id         int       `json:"id"`
 	ImageUrl   ImageUrls `json:"image_urls"`
 	Restrict   int       `json:"x-restrict"`
-	Tags       []string  `json:"tags"`
+	//Tags       []string  `json:"tags"`
 }
 
 type Illust struct {
