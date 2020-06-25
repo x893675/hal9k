@@ -20,4 +20,4 @@ services:
       - coolq
     restart: always
     volumes:
-      - /opt/coolq/
+      - /opt/coolq/data/image:/data

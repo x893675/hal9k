@@ -6,9 +6,14 @@ import (
 	qqbotapi "github.com/catsworld/qq-bot-api"
 	"hal9k/pkg/client/qbot"
 	"hal9k/pkg/logger"
+	"hal9k/pkg/utils/envutils"
 	"io/ioutil"
 	"math"
 	"math/big"
+)
+
+var (
+	graphBedAddr = envutils.GetEnvironment("GRAPH_ADDR", "http://localhost:8080")
 )
 
 func init() {
@@ -43,7 +48,7 @@ func ShowImage(update qqbotapi.Update) {
 	}
 	index := RangeRand(0, int64(imgNum)-1)
 	imgname := files[index].Name()
-	msg := fmt.Sprintf("[CQ:image,file=%s\\%s]", args[0], imgname)
+	msg := fmt.Sprintf("[CQ:image,file=%s/%s/%s]", graphBedAddr, args[0], imgname)
 	logger.Info(nil, "msg is %v", msg)
 	reply(update, msg)
 }

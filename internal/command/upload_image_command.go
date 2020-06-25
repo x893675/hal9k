@@ -4,29 +4,39 @@ import (
 	"fmt"
 	qqbotapi "github.com/catsworld/qq-bot-api"
 	"github.com/catsworld/qq-bot-api/cqcode"
+	"hal9k/internal/constants"
 	"hal9k/pkg/client/qbot"
 	"hal9k/pkg/logger"
+	"hal9k/pkg/utils/envutils"
 	"io"
 	"net/http"
 	"os"
 )
 
-var imagePath string
+var (
+	imagePath = envutils.GetEnvironment("IMAGE_PATH", "/Users/hanamichi/work/github/hal9k/data")
+)
 
 func init() {
-	v := os.Getenv("IMAGE_PATH")
-	if v == "" {
-		imagePath = "/Users/hanamichi/work/github/hal9k/data"
-	} else {
-		imagePath = v
-	}
 	qbot.RegistryCommandHandler("image", UploadImageCommand)
 }
 
 func UploadImageCommand(update qqbotapi.Update) {
 	_, args := update.Message.Command()
+	switch args[0] {
+	case constants.UploadCommand:
+		uploadImage(update, args[2:])
+		return
+	case constants.HelpCommand:
+	default:
+		reply(update, "参数错误!\n/不支持的自命令，使用/image help查看用法")
+		return
+	}
+}
+
+func uploadImage(update qqbotapi.Update, args []string) {
 	if len(args) != 2 {
-		reply(update, "参数错误!\n/image $catalog image")
+		reply(update, "参数错误!\n/image upload $catalog image")
 		return
 	}
 	msg, err := cqcode.ParseMessage(args[1])
