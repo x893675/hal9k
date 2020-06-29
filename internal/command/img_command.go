@@ -44,7 +44,7 @@ func ShowImage(update qqbotapi.Update) {
 	}
 	imgs := make([]os.FileInfo, 0)
 	for _, item := range files {
-		if !item.IsDir() && isHidden(item.Name()) {
+		if !item.IsDir() && !isHidden(item.Name()) {
 			imgs = append(imgs, item)
 		}
 	}
