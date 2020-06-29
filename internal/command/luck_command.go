@@ -24,7 +24,6 @@ var (
 	luckFile string
 )
 
-
 func init() {
 	v := os.Getenv("LUCK_FILE")
 	if v == "" {
@@ -69,9 +68,10 @@ func LuckCommand(update qqbotapi.Update) {
 func getUserSign(userId int64) int {
 	ts := time.Now()
 	today := fmt.Sprintf("%d%d%d", ts.Year(), int(ts.Month()), ts.Day())
-	formatToday, _ := strconv.ParseInt(today, 10, 32)
-	strnum := strconv.FormatInt(formatToday*userId, 10)
+	formatToday, _ := strconv.ParseInt(today, 10, 64)
+	formatUserId, _ := strconv.ParseInt(strconv.FormatInt(userId, 10)[:6], 10, 64)
+	strnum := strconv.FormatInt(formatToday*formatUserId, 10)
 	str := hashutils.MD5Hash([]byte(strnum))
-	num, _ := strconv.ParseInt(strings.ToUpper(str), 16, 64)
+	num, _ := strconv.ParseUint(strings.ToUpper(str)[:8], 16, 64)
 	return int(num%100 + 1)
 }

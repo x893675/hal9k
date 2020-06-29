@@ -6,11 +6,13 @@ import (
 	"fmt"
 	"hal9k/internal/constants"
 	"hal9k/pkg/logger"
+	"hal9k/pkg/utils/hashutils"
 	"io/ioutil"
 	"math"
 	"math/big"
 	"net/http"
-	"net/url"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -41,7 +43,8 @@ func main() {
 	//str := "12453435353535353"
 	//result,_ := regexp.MatchString(pattern,str)
 	//fmt.Println(result)
-	searchByWord("FGO")
+	//searchByWord("FGO")
+	fmt.Println(getUserSign(540386505))
 	//searchByID("77558582")
 }
 
@@ -65,7 +68,7 @@ func searchByID(id string) {
 		Transport:     nil,
 		CheckRedirect: nil,
 		Jar:           nil,
-		Timeout:       5*time.Second,
+		Timeout:       5 * time.Second,
 	}
 	resp, err := c.Get(fmt.Sprintf("%s%s", constants.PixivSearchByIDURL, id))
 	if err != nil {
@@ -87,39 +90,49 @@ func searchByID(id string) {
 	logger.Info(nil, "+%v", illust)
 }
 
+//func searchByWord(keyword string) {
+//	key := url.QueryEscape(keyword)
+//	c := http.Client{
+//		Transport:     nil,
+//		CheckRedirect: nil,
+//		Jar:           nil,
+//		Timeout:       5 * time.Second,
+//	}
+//	resp, err := c.Get(fmt.Sprintf(constants.PixivSearchByKeyword, key))
+//	if err != nil {
+//		logger.Error(nil, "search pixiv  by keywork error, %v", err)
+//		return
+//	}
+//	body, err := ioutil.ReadAll(resp.Body)
+//	if err != nil {
+//		logger.Error(nil, err.Error())
+//		return
+//	}
+//	var illust Illusts
+//	err = json.Unmarshal(body, &illust)
+//	if err != nil {
+//		logger.Error(nil, err.Error())
+//		return
+//	}
+//	if len(illust.Illusts) > 0 {
+//		index := RangeRand(0, int64(len(illust.Illusts)-1))
+//		if illust.Illusts[index].ImageUrl.Large == "" {
+//			return
+//		}
+//		fmt.Println(fmt.Sprintf("[CQ:image,file=%s,cache=0]", illust.Illusts[index].ImageUrl.Large))
+//	} else {
+//		return
+//	}
+//
+//}
 
-func searchByWord(keyword string) {
-	key := url.QueryEscape(keyword)
-	c := http.Client{
-		Transport:     nil,
-		CheckRedirect: nil,
-		Jar:           nil,
-		Timeout:       5 * time.Second,
-	}
-	resp, err := c.Get(fmt.Sprintf(constants.PixivSearchByKeyword, key))
-	if err != nil {
-		logger.Error(nil, "search pixiv  by keywork error, %v", err)
-		return
-	}
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		logger.Error(nil, err.Error())
-		return
-	}
-	var illust Illusts
-	err = json.Unmarshal(body, &illust)
-	if err != nil {
-		logger.Error(nil, err.Error())
-		return
-	}
-	if len(illust.Illusts) > 0 {
-		index := RangeRand(0, int64(len(illust.Illusts)-1))
-		if illust.Illusts[index].ImageUrl.Large == "" {
-			return
-		}
-		fmt.Println(fmt.Sprintf("[CQ:image,file=%s,cache=0]", illust.Illusts[index].ImageUrl.Large))
-	} else {
-		return
-	}
-
+func getUserSign(userId int64) int {
+	ts := time.Now()
+	today := fmt.Sprintf("%d%d%d", ts.Year(), int(ts.Month()), ts.Day())
+	formatToday, _ := strconv.ParseInt(today, 10, 64)
+	formatUserId, _ := strconv.ParseInt(strconv.FormatInt(userId, 10)[:6], 10, 64)
+	strnum := strconv.FormatInt(formatToday*formatUserId, 10)
+	str := hashutils.MD5Hash([]byte(strnum))
+	num, _ := strconv.ParseUint(strings.ToUpper(str)[:8], 16, 64)
+	return int(num%100 + 1)
 }

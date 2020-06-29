@@ -10,6 +10,7 @@ import (
 	"io/ioutil"
 	"math"
 	"math/big"
+	"os"
 )
 
 var (
@@ -41,13 +42,19 @@ func ShowImage(update qqbotapi.Update) {
 		logger.Error(nil, err.Error())
 		return
 	}
-	imgNum := len(files)
+	imgs := make([]os.FileInfo, 0)
+	for _, item := range files {
+		if !item.IsDir() && isHidden(item.Name()) {
+			imgs = append(imgs, item)
+		}
+	}
+	imgNum := len(imgs)
 	if imgNum == 0 {
 		reply(update, fmt.Sprintf("不存在标签为%s的图片!", args[0]))
 		return
 	}
 	index := RangeRand(0, int64(imgNum)-1)
-	imgname := files[index].Name()
+	imgname := imgs[index].Name()
 	msg := fmt.Sprintf("[CQ:image,file=%s/%s/%s]", graphBedAddr, args[0], imgname)
 	logger.Info(nil, "msg is %v", msg)
 	reply(update, msg)
@@ -66,4 +73,12 @@ func RangeRand(min, max int64) int64 {
 		result, _ := rand.Int(rand.Reader, big.NewInt(max-min+1))
 		return min + result.Int64()
 	}
+}
+
+func isHidden(filename string) bool {
+	// linux/unix only
+	if filename[0:1] == "." {
+		return true
+	}
+	return false
 }
