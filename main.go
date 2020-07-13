@@ -44,8 +44,16 @@ func main() {
 	//result,_ := regexp.MatchString(pattern,str)
 	//fmt.Println(result)
 	//searchByWord("FGO")
-	fmt.Println(getUserSign(540386505))
+	//fmt.Println(getUserSign(540386505))
 	//searchByID("77558582")
+	helpMsg := `
+Bot相关指令:
+1. /image: 图片相关功能(上传图片等)，详细命令使用/image help查询
+2. /img $catalog: 随机发送一张分类为$catalog的图片
+3. /luck,/占卜: 今日浅草寺占卜
+4. /div,/卜卦: 周易卜卦
+5. /pixiv: pixiv图片相关功能，详细命令使用/pixiv help查询`
+	fmt.Println(helpMsg)
 }
 
 func RangeRand(min, max int64) int64 {

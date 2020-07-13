@@ -8,5 +8,5 @@ import (
 )
 
 func NewHttpServer(s *config.ServiceConfig) error {
-	return http.ListenAndServe(fmt.Sprintf("0.0.0.0:%s",s.Port),nil)
+	return http.ListenAndServe(fmt.Sprintf("0.0.0.0:%s", s.Port), nil)
 }

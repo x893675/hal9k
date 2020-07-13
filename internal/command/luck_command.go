@@ -39,6 +39,7 @@ func init() {
 		_luckMap[item.Number] = item
 	}
 	qbot.RegistryCommandHandler("luck", LuckCommand)
+	qbot.RegistryCommandHandler("占卜", LuckCommand)
 }
 
 func parseLuckData() ([]*LuckData, error) {
