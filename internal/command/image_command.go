@@ -29,7 +29,8 @@ func UploadImageCommand(update qqbotapi.Update) {
 		uploadImage(update, args[1:])
 		return
 	case constants.HelpCommand:
-		fallthrough
+		reply(update, printImageHelp())
+		return
 	default:
 		reply(update, "参数错误!\n不支持的子命令，使用/image help查看用法")
 		return
@@ -97,4 +98,12 @@ func PathExists(path string) (bool, error) {
 		return false, nil
 	}
 	return false, err
+}
+
+func printImageHelp() string {
+	helpMsg := `
+image命令:
+1. /image upload $catalog $picture: 上传图片并且标注图片类别
+2. /image help: 打印帮助信息`
+	return helpMsg
 }
